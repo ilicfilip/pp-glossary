@@ -58,6 +58,47 @@ function pp_glossary_substr( string $text, int $start, ?int $length = null ): st
 }
 
 /**
+ * Get the HTML tags that should be excluded from glossary term linking.
+ *
+ * Retrieves the configured excluded tags and applies the pp_glossary_excluded_tags filter.
+ *
+ * @return array<int, string> Array of HTML tag names.
+ */
+function pp_glossary_get_excluded_tags(): array {
+	$excluded_tags = PP_Glossary\Settings::get_excluded_tags();
+
+	/**
+	 * Filter the excluded tags.
+	 *
+	 * @param array<int, string> $excluded_tags The excluded tags.
+	 *
+	 * @return array<int, string> The excluded tags.
+	 */
+	return apply_filters( 'pp_glossary_excluded_tags', $excluded_tags );
+}
+
+/**
+ * Split text into parts, separating excluded HTML tag elements.
+ *
+ * Returns an array of text chunks where excluded tag elements (e.g. <a>...</a>)
+ * are their own entries. Check if a part starts with an excluded tag using
+ * preg_match to skip it during processing.
+ *
+ * @param string            $text          The text to split.
+ * @param array<int,string> $excluded_tags Array of HTML tag names to split on.
+ * @return array<int, string>|false Array of parts, or false on regex failure.
+ */
+function pp_glossary_split_by_excluded_tags( string $text, array $excluded_tags ) {
+	$excluded_pattern = '';
+	foreach ( $excluded_tags as $tag ) {
+		$excluded_pattern .= '<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>|';
+	}
+	$excluded_pattern = rtrim( $excluded_pattern, '|' );
+
+	return preg_split( '/(' . $excluded_pattern . ')/is', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+}
+
+/**
  * Get all published glossary entries with their metadata.
  *
  * This is a shared helper function used by multiple components

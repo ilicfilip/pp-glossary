@@ -64,20 +64,8 @@ class Term_Linker {
 	 * @return string Modified text.
 	 */
 	private static function replace_first_term_occurrence( string $text, array $entry, string $glossary_url ): string {
-		$excluded_tags = Settings::get_excluded_tags();
-
-		/** This filter is documented in includes/class-content-filter.php */
-		$excluded_tags = apply_filters( 'pp_glossary_excluded_tags', $excluded_tags );
-
-		// Build the pattern for excluded tags.
-		$excluded_pattern = '';
-		foreach ( $excluded_tags as $tag ) {
-			$excluded_pattern .= '<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>|';
-		}
-		$excluded_pattern = rtrim( $excluded_pattern, '|' );
-
-		// Split text by excluded tags.
-		$parts = preg_split( '/(' . $excluded_pattern . ')/is', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+		$excluded_tags = pp_glossary_get_excluded_tags();
+		$parts         = pp_glossary_split_by_excluded_tags( $text, $excluded_tags );
 
 		if ( false === $parts ) {
 			return $text;

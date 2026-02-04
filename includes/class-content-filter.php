@@ -120,29 +120,9 @@ class Content_Filter {
 	 * @return string Modified content.
 	 */
 	private static function replace_first_occurrence( $content, $entry ): string {
-		// Get excluded tags from settings.
-		$excluded_tags = Settings::get_excluded_tags();
+		$excluded_tags = pp_glossary_get_excluded_tags();
+		$parts         = pp_glossary_split_by_excluded_tags( $content, $excluded_tags );
 
-		/**
-		 * Filter the excluded tags.
-		 *
-		 * @param array $excluded_tags The excluded tags.
-		 *
-		 * @return array The excluded tags.
-		 */
-		$excluded_tags = apply_filters( 'pp_glossary_excluded_tags', $excluded_tags );
-
-		// Build the pattern for excluded tags only.
-		$excluded_pattern = '';
-		foreach ( $excluded_tags as $tag ) {
-			$excluded_pattern .= '<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>|';
-		}
-		$excluded_pattern = rtrim( $excluded_pattern, '|' );
-
-		// Split content ONCE by excluded tags.
-		$parts = preg_split( '/(' . $excluded_pattern . ')/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
-
-		// If preg_split fails, return content unchanged.
 		if ( false === $parts ) {
 			return $content;
 		}
