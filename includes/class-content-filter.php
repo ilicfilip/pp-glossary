@@ -113,70 +113,12 @@ class Content_Filter {
 	}
 
 	/**
-	 * Get all glossary entries with their metadata
+	 * Get linkable glossary entries (excludes entries with auto-linking disabled)
 	 *
 	 * @return array<int, array<string, mixed>> Array of glossary entries.
 	 */
 	private static function get_glossary_entries(): array {
-		$entries = [];
-
-		$query = new \WP_Query(
-			[
-				'post_type'      => 'pp_glossary',
-				'posts_per_page' => -1,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-			]
-		);
-
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post_id = (int) get_the_ID();
-
-				$data = Meta_Boxes::get_entry_data( $post_id );
-
-				// Skip entries that have auto-linking disabled.
-				if ( $data['disable_autolink'] ) {
-					continue;
-				}
-
-				// Build array of terms (title + synonyms).
-				$terms = [ get_the_title() ];
-
-				if ( ! empty( $data['synonyms'] ) && is_array( $data['synonyms'] ) ) {
-					foreach ( $data['synonyms'] as $synonym ) {
-						if ( ! empty( $synonym ) ) {
-							$terms[] = $synonym;
-						}
-					}
-				}
-
-				$entries[] = [
-					'id'                => $post_id,
-					'slug'              => sanitize_title( get_the_title() ),
-					'title'             => get_the_title(),
-					'terms'             => $terms,
-					'short_description' => $data['short_description'],
-					'long_description'  => $data['long_description'],
-					'case_sensitive'    => $data['case_sensitive'],
-				];
-			}
-			wp_reset_postdata();
-		}
-
-		// Sort by longest term first to handle overlapping terms correctly.
-		usort(
-			$entries,
-			function ( $a, $b ) {
-				$max_len_a = max( array_map( 'strlen', $a['terms'] ) );
-				$max_len_b = max( array_map( 'strlen', $b['terms'] ) );
-				return $max_len_b - $max_len_a;
-			}
-		);
-
-		return $entries;
+		return pp_glossary_get_linkable_entries();
 	}
 
 	/**

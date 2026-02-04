@@ -82,37 +82,7 @@ class Schema {
 	 * @return array<int, array<string, mixed>> Array of glossary entries.
 	 */
 	private static function get_glossary_entries_for_schema(): array {
-		$entries = [];
-
-		$query = new \WP_Query(
-			[
-				'post_type'      => 'pp_glossary',
-				'posts_per_page' => -1,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-			]
-		);
-
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post_id = (int) get_the_ID();
-				$data    = Meta_Boxes::get_entry_data( $post_id );
-
-				$entries[] = [
-					'id'                => $post_id,
-					'slug'              => sanitize_title( get_the_title() ),
-					'title'             => get_the_title(),
-					'short_description' => $data['short_description'],
-					'long_description'  => $data['long_description'],
-					'synonyms'          => $data['synonyms'],
-				];
-			}
-			wp_reset_postdata();
-		}
-
-		return $entries;
+		return pp_glossary_get_entries();
 	}
 
 	/**
