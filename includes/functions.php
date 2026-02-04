@@ -5,6 +5,11 @@
  * @package PP_Glossary
  */
 
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * Multibyte-safe string to lowercase wrapper.
  *
