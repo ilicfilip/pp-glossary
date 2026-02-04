@@ -36,7 +36,7 @@ class Term_Linker {
 			return $text;
 		}
 
-		$entries = self::get_linkable_entries();
+		$entries = pp_glossary_get_linkable_entries();
 		if ( empty( $entries ) ) {
 			return $text;
 		}
@@ -53,16 +53,10 @@ class Term_Linker {
 	}
 
 	/**
-	 * Get linkable glossary entries (excludes entries with auto-linking disabled)
-	 *
-	 * @return array<int, array<string, mixed>> Array of glossary entries.
-	 */
-	private static function get_linkable_entries(): array {
-		return pp_glossary_get_linkable_entries();
-	}
-
-	/**
 	 * Replace first occurrence of any term in entry
+	 *
+	 * Splits text by excluded tags (e.g. <a>, headings) to avoid creating
+	 * nested anchors or linking inside elements that should be skipped.
 	 *
 	 * @param string               $text         The text to process.
 	 * @param array<string, mixed> $entry        The glossary entry data.
@@ -70,34 +64,63 @@ class Term_Linker {
 	 * @return string Modified text.
 	 */
 	private static function replace_first_term_occurrence( string $text, array $entry, string $glossary_url ): string {
-		// Try each term until we find a match.
+		$excluded_tags = Settings::get_excluded_tags();
+
+		/** This filter is documented in includes/class-content-filter.php */
+		$excluded_tags = apply_filters( 'pp_glossary_excluded_tags', $excluded_tags );
+
+		// Build the pattern for excluded tags.
+		$excluded_pattern = '';
+		foreach ( $excluded_tags as $tag ) {
+			$excluded_pattern .= '<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>|';
+		}
+		$excluded_pattern = rtrim( $excluded_pattern, '|' );
+
+		// Split text by excluded tags.
+		$parts = preg_split( '/(' . $excluded_pattern . ')/is', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+
+		if ( false === $parts ) {
+			return $text;
+		}
+
+		// Try each term until we find a match in a non-excluded part.
 		foreach ( $entry['terms'] as $term ) {
-			// Build regex pattern.
-			// Use case-insensitive matching unless the entry is marked as case sensitive.
-			$flags   = $entry['case_sensitive'] ? 'u' : 'iu';
-			$pattern = '/\b(' . preg_quote( $term, '/' ) . ')\b(?![^<]*>)/' . $flags;
+			$replaced  = false;
+			$new_parts = [];
+			$flags     = $entry['case_sensitive'] ? 'u' : 'iu';
+			$pattern   = '/\b(' . preg_quote( $term, '/' ) . ')\b(?![^<]*>)/' . $flags;
 
-			// Find first match with offset.
-			if ( preg_match( $pattern, $text, $matches, PREG_OFFSET_CAPTURE ) ) {
-				$matched_term = $matches[1][0];
-				$offset       = $matches[1][1];
+			foreach ( $parts as $part ) {
+				// If already replaced or this is an excluded tag, keep as-is.
+				if ( $replaced || preg_match( '/^<(?:' . implode( '|', $excluded_tags ) . ')\b/i', $part ) ) {
+					$new_parts[] = $part;
+					continue;
+				}
 
-				// Create link HTML.
-				$link_html = sprintf(
-					'<a href="%s#%s" class="pp-glossary-link">%s</a>',
-					esc_url( $glossary_url ),
-					esc_attr( $entry['slug'] ),
-					esc_html( $matched_term )
-				);
+				if ( preg_match( $pattern, $part, $matches, PREG_OFFSET_CAPTURE ) ) {
+					$matched_term = $matches[1][0];
+					$offset       = $matches[1][1];
 
-				// Replace only this occurrence.
-				$text = substr_replace( $text, $link_html, $offset, strlen( $matched_term ) );
+					$link_html = sprintf(
+						'<a href="%s#%s" class="pp-glossary-link">%s</a>',
+						esc_url( $glossary_url ),
+						esc_attr( $entry['slug'] ),
+						esc_html( $matched_term )
+					);
 
-				// Return immediately - only replace first occurrence.
-				return $text;
+					$new_parts[] = substr_replace( $part, $link_html, $offset, strlen( $matched_term ) );
+					$replaced    = true;
+				} else {
+					$new_parts[] = $part;
+				}
+			}
+
+			if ( $replaced ) {
+				$parts = $new_parts;
+				break;
 			}
 		}
 
-		return $text;
+		return implode( '', $parts );
 	}
 }

@@ -112,7 +112,6 @@ class Content_Filter {
 		return $content;
 	}
 
-
 	/**
 	 * Replace first occurrence of glossary terms in content
 	 *
