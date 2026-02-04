@@ -325,7 +325,12 @@ class Content_Filter {
 		$popover_html .= sprintf( '<strong class="glossary-title">%s</strong>', $title );
 
 		if ( ! empty( $entry['short_description'] ) ) {
-			$popover_html .= sprintf( '<p>%s</p>', esc_html( $entry['short_description'] ) );
+			// Link glossary terms within the short description, excluding self.
+			$short_desc    = Term_Linker::link_terms_in_text(
+				$entry['short_description'],
+				$entry['id']
+			);
+			$popover_html .= sprintf( '<p>%s</p>', wp_kses_post( $short_desc ) );
 		}
 
 		$popover_html .= '</aside>';
