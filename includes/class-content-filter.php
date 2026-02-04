@@ -90,7 +90,7 @@ class Content_Filter {
 		}
 
 		// Get all glossary entries.
-		$glossary_entries = self::get_glossary_entries();
+		$glossary_entries = pp_glossary_get_linkable_entries();
 
 		if ( empty( $glossary_entries ) ) {
 			return $content;
@@ -112,14 +112,6 @@ class Content_Filter {
 		return $content;
 	}
 
-	/**
-	 * Get linkable glossary entries (excludes entries with auto-linking disabled)
-	 *
-	 * @return array<int, array<string, mixed>> Array of glossary entries.
-	 */
-	private static function get_glossary_entries(): array {
-		return pp_glossary_get_linkable_entries();
-	}
 
 	/**
 	 * Replace first occurrence of glossary terms in content

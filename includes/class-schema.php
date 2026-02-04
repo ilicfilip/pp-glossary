@@ -41,7 +41,7 @@ class Schema {
 		}
 
 		// Get all glossary entries.
-		$entries = self::get_glossary_entries_for_schema();
+		$entries = pp_glossary_get_entries();
 
 		if ( empty( $entries ) ) {
 			return $graph;
@@ -74,15 +74,6 @@ class Schema {
 		$graph[] = $defined_term_set;
 
 		return $graph;
-	}
-
-	/**
-	 * Get glossary entries formatted for schema
-	 *
-	 * @return array<int, array<string, mixed>> Array of glossary entries.
-	 */
-	private static function get_glossary_entries_for_schema(): array {
-		return pp_glossary_get_entries();
 	}
 
 	/**
