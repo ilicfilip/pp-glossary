@@ -145,6 +145,8 @@ class Blocks {
 									<?php
 									$description = ! empty( $entry['long_description'] ) ? $entry['long_description'] : $entry['short_description'];
 									if ( ! empty( $description ) ) :
+										// Link glossary terms within the description, excluding self.
+										$description = Term_Linker::link_terms_in_text( $description, $entry['id'] );
 										?>
 										<div class="glossary-long-description" <?php echo Schema::get_itemprop( 'description' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 											<?php echo wp_kses_post( $description ); ?>
