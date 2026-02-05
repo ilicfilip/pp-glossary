@@ -4,7 +4,7 @@ Tags: glossary, definitions, terms, dictionary
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -143,6 +143,21 @@ Yes, the plugin includes a Glossary List block that you can add to any page or p
 5. Settings page for configuring the glossary page.
 
 == Changelog ==
+
+= 1.3.0 =
+
+New:
+
+* Glossary terms within glossary descriptions and popovers are now automatically linked (nested term linking).
+* Added FAIR verification with hourly verification of PLC DID and FAIR metadata.
+
+Enhancements:
+
+* Consolidated glossary entry queries into shared helper functions for better performance.
+* Improved accessibility: added screen reader text and moved "Read more" link to bottom of popover.
+* Changed cursor to `help` for glossary terms to better indicate interactive definitions.
+* Updated banners and optimized images.
+* Updated install instructions.
 
 = 1.2 =
 

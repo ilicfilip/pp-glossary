@@ -279,6 +279,21 @@ GPL v2 or later
 
 ## Changelog
 
+### 1.3.0
+
+New:
+
+- Glossary terms within glossary descriptions and popovers are now automatically linked (nested term linking).
+- Added FAIR verification with hourly verification of PLC DID and FAIR metadata.
+
+Enhancements:
+
+- Consolidated glossary entry queries into shared helper functions for better performance.
+- Improved accessibility: added screen reader text and moved "Read more" link to bottom of popover.
+- Changed cursor to `help` for glossary terms to better indicate interactive definitions.
+- Updated banners and optimized images.
+- Updated install instructions.
+
 ### 1.2.0
 
 - Excluded glossary entries from Yoast SEO indexables and XML sitemaps (entries have no public pages)
