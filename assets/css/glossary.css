@@ -5,6 +5,22 @@
  */
 
 /* ==========================================================================
+   Screen Reader Only (visually hidden but accessible)
+   ========================================================================== */
+
+.pp-glossary-sr-only {
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	white-space: nowrap;
+}
+
+/* ==========================================================================
    Glossary Term Spans
    ========================================================================== */
 
@@ -19,7 +35,7 @@ dfn.pp-glossary-term span {
 	text-decoration-thickness: 1px;
 	text-decoration-color: var(--glossary-underline-color, rgba(0, 0, 0, 0.4));
 	text-underline-offset: 3px;
-	cursor: pointer;
+	cursor: help;
 	font-weight: inherit;
 	font-size: inherit;
 	line-height: inherit;
@@ -32,6 +48,30 @@ dfn.pp-glossary-term span:focus {
 }
 
 dfn.pp-glossary-term span:focus-visible {
+	outline: 2px solid var(--glossary-focus-color, #005a87);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+/* ==========================================================================
+   Nested Glossary Links (within definitions)
+   ========================================================================== */
+
+.pp-glossary-link {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	text-decoration-thickness: 1px;
+	text-decoration-color: var(--glossary-underline-color, rgba(0, 0, 0, 0.4));
+	text-underline-offset: 3px;
+}
+
+.pp-glossary-link:hover,
+.pp-glossary-link:focus {
+	text-decoration-color: var(--glossary-underline-hover-color, rgba(0, 0, 0, 0.7));
+}
+
+.pp-glossary-link:focus-visible {
 	outline: 2px solid var(--glossary-focus-color, #005a87);
 	outline-offset: 2px;
 	border-radius: 2px;
@@ -68,7 +108,6 @@ aside[popover] .glossary-title {
 	font-size: 1.05rem;
 	font-weight: 600;
 	color: var(--glossary-heading-color, #000);
-	margin-top: 0.5rem;
 	margin-bottom: 0.5rem;
 }
 

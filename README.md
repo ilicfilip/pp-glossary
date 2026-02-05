@@ -1,4 +1,4 @@
-# Glossary by Progress Planner
+# Glossary
 
 [![Try Glossary on the WordPress playground](https://img.shields.io/badge/Try%20Glossary%20on%20the%20WordPress%20Playground-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=ddd)](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-glossary.php)
 
@@ -38,9 +38,7 @@ A semantic, accessible WordPress glossary plugin that automatically links terms 
    cd wp-content/plugins/
    git clone [repository-url] pp-glossary
    ```
-
-2. Activate the "Glossary by Progress Planner" plugin in your WordPress admin panel
-
+2. Activate the "Glossary" plugin in your WordPress admin panel
 3. Navigate to **Glossary** in the WordPress admin menu to start adding entries
 
 ## Setup
@@ -280,6 +278,21 @@ composer run phpcs
 GPL v2 or later
 
 ## Changelog
+
+### 1.3.0
+
+New:
+
+- Glossary terms within glossary descriptions and popovers are now automatically linked (nested term linking).
+- Added FAIR verification with hourly verification of PLC DID and FAIR metadata.
+
+Enhancements:
+
+- Consolidated glossary entry queries into shared helper functions for better performance.
+- Improved accessibility: added screen reader text and moved "Read more" link to bottom of popover.
+- Changed cursor to `help` for glossary terms to better indicate interactive definitions.
+- Updated banners and optimized images.
+- Updated install instructions.
 
 ### 1.2.0
 

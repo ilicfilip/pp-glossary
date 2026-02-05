@@ -313,6 +313,7 @@ class Settings {
 		}
 
 		$permalink = get_permalink( $page_id );
+
 		return $permalink ? $permalink : '';
 	}
 
