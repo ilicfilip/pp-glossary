@@ -54,6 +54,30 @@ dfn.pp-glossary-term span:focus-visible {
 }
 
 /* ==========================================================================
+   Nested Glossary Links (within definitions)
+   ========================================================================== */
+
+.pp-glossary-link {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	text-decoration-thickness: 1px;
+	text-decoration-color: var(--glossary-underline-color, rgba(0, 0, 0, 0.4));
+	text-underline-offset: 3px;
+}
+
+.pp-glossary-link:hover,
+.pp-glossary-link:focus {
+	text-decoration-color: var(--glossary-underline-hover-color, rgba(0, 0, 0, 0.7));
+}
+
+.pp-glossary-link:focus-visible {
+	outline: 2px solid var(--glossary-focus-color, #005a87);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+/* ==========================================================================
    Popover Styles
    ========================================================================== */
 

@@ -117,25 +117,15 @@ class Blocks {
 										</p>
 									<?php endif; ?>
 
-									<?php if ( ! empty( $entry['synonyms'] ) && is_array( $entry['synonyms'] ) ) : ?>
+									<?php if ( ! empty( $entry['synonyms'] ) ) : ?>
 										<div class="glossary-synonyms">
 											<span class="synonyms-label"><?php esc_html_e( 'Also known as:', 'pp-glossary' ); ?></span>
-											<?php
-											$synonym_terms = [];
-											foreach ( $entry['synonyms'] as $synonym ) {
-												if ( ! empty( $synonym ) ) {
-													$synonym_terms[] = esc_html( $synonym );
-												}
-											}
-											?>
-											<span><?php echo esc_html( implode( ', ', $synonym_terms ) ); ?></span>
+											<span><?php echo esc_html( implode( ', ', $entry['synonyms'] ) ); ?></span>
 											<?php
 											// Output multiple meta tags for Microdata (array of alternateName).
 											if ( ! defined( 'WPSEO_VERSION' ) ) {
 												foreach ( $entry['synonyms'] as $synonym ) {
-													if ( ! empty( $synonym ) ) {
-														echo '<meta itemprop="alternateName" content="' . esc_attr( $synonym ) . '">';
-													}
+													echo '<meta itemprop="alternateName" content="' . esc_attr( $synonym ) . '">';
 												}
 											}
 											?>
@@ -145,6 +135,8 @@ class Blocks {
 									<?php
 									$description = ! empty( $entry['long_description'] ) ? $entry['long_description'] : $entry['short_description'];
 									if ( ! empty( $description ) ) :
+										// Link glossary terms within the description, excluding self.
+										$description = Term_Linker::link_terms_in_text( $description, $entry['id'] );
 										?>
 										<div class="glossary-long-description" <?php echo Schema::get_itemprop( 'description' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 											<?php echo wp_kses_post( $description ); ?>
@@ -171,48 +163,24 @@ class Blocks {
 	 */
 	private static function get_grouped_entries(): array {
 		$grouped = [];
+		$entries = pp_glossary_get_entries();
 
-		$query = new \WP_Query(
-			[
-				'post_type'      => 'pp_glossary',
-				'posts_per_page' => -1,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-			]
-		);
+		foreach ( $entries as $entry ) {
+			$letter = pp_glossary_strtoupper( pp_glossary_substr( $entry['title'], 0, 1 ) );
 
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$title  = get_the_title();
-				$letter = pp_glossary_strtoupper( pp_glossary_substr( $title, 0, 1 ) );
-
-				// Handle numbers and special characters.
-				// Match Latin (including extended), Cyrillic, and Greek letters.
-				if ( ! preg_match( '/[\p{Latin}\p{Cyrillic}\p{Greek}]/u', $letter ) ) {
-					$letter = '#';
-				}
-
-				if ( ! isset( $grouped[ $letter ] ) ) {
-					$grouped[ $letter ] = [];
-				}
-
-				$post_id              = (int) get_the_ID();
-				$data                 = Meta_Boxes::get_entry_data( $post_id );
-				$grouped[ $letter ][] = [
-					'id'                => $post_id,
-					'slug'              => sanitize_title( $title ),
-					'title'             => $title,
-					'short_description' => $data['short_description'],
-					'long_description'  => $data['long_description'],
-					'synonyms'          => $data['synonyms'],
-				];
+			// Handle numbers and special characters.
+			// Match Latin (including extended), Cyrillic, and Greek letters.
+			if ( ! preg_match( '/[\p{Latin}\p{Cyrillic}\p{Greek}]/u', $letter ) ) {
+				$letter = '#';
 			}
-			wp_reset_postdata();
+
+			if ( ! isset( $grouped[ $letter ] ) ) {
+				$grouped[ $letter ] = [];
+			}
+
+			$grouped[ $letter ][] = $entry;
 		}
 
-		// Sort by letter.
 		ksort( $grouped );
 
 		return $grouped;

@@ -492,6 +492,20 @@ Synonyms are stored as a simple array of strings:
 ['CLS', 'layout shift']
 ```
 
+## Local Test Environment
+
+A local WordPress site is available for testing:
+
+- **Site URL:** http://localhost:10049/
+- **Glossary page:** http://localhost:10049/glossary/
+- **Admin:** http://localhost:10049/wp-admin/
+
+Use this environment to test:
+- Glossary block rendering and alphabetical navigation
+- Popover triggers and content display
+- Nested term linking within definitions
+- CSS styling and accessibility features
+
 ## Testing Tips
 
 ### General Testing

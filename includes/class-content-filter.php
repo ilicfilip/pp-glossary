@@ -90,7 +90,7 @@ class Content_Filter {
 		}
 
 		// Get all glossary entries.
-		$glossary_entries = self::get_glossary_entries();
+		$glossary_entries = pp_glossary_get_linkable_entries();
 
 		if ( empty( $glossary_entries ) ) {
 			return $content;
@@ -113,73 +113,6 @@ class Content_Filter {
 	}
 
 	/**
-	 * Get all glossary entries with their metadata
-	 *
-	 * @return array<int, array<string, mixed>> Array of glossary entries.
-	 */
-	private static function get_glossary_entries(): array {
-		$entries = [];
-
-		$query = new \WP_Query(
-			[
-				'post_type'      => 'pp_glossary',
-				'posts_per_page' => -1,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-			]
-		);
-
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post_id = (int) get_the_ID();
-
-				$data = Meta_Boxes::get_entry_data( $post_id );
-
-				// Skip entries that have auto-linking disabled.
-				if ( $data['disable_autolink'] ) {
-					continue;
-				}
-
-				// Build array of terms (title + synonyms).
-				$terms = [ get_the_title() ];
-
-				if ( ! empty( $data['synonyms'] ) && is_array( $data['synonyms'] ) ) {
-					foreach ( $data['synonyms'] as $synonym ) {
-						if ( ! empty( $synonym ) ) {
-							$terms[] = $synonym;
-						}
-					}
-				}
-
-				$entries[] = [
-					'id'                => $post_id,
-					'slug'              => sanitize_title( get_the_title() ),
-					'title'             => get_the_title(),
-					'terms'             => $terms,
-					'short_description' => $data['short_description'],
-					'long_description'  => $data['long_description'],
-					'case_sensitive'    => $data['case_sensitive'],
-				];
-			}
-			wp_reset_postdata();
-		}
-
-		// Sort by longest term first to handle overlapping terms correctly.
-		usort(
-			$entries,
-			function ( $a, $b ) {
-				$max_len_a = max( array_map( 'strlen', $a['terms'] ) );
-				$max_len_b = max( array_map( 'strlen', $b['terms'] ) );
-				return $max_len_b - $max_len_a;
-			}
-		);
-
-		return $entries;
-	}
-
-	/**
 	 * Replace first occurrence of glossary terms in content
 	 *
 	 * @param string               $content The content.
@@ -187,29 +120,9 @@ class Content_Filter {
 	 * @return string Modified content.
 	 */
 	private static function replace_first_occurrence( $content, $entry ): string {
-		// Get excluded tags from settings.
-		$excluded_tags = Settings::get_excluded_tags();
+		$excluded_tags = pp_glossary_get_excluded_tags();
+		$parts         = pp_glossary_split_by_excluded_tags( $content, $excluded_tags );
 
-		/**
-		 * Filter the excluded tags.
-		 *
-		 * @param array $excluded_tags The excluded tags.
-		 *
-		 * @return array The excluded tags.
-		 */
-		$excluded_tags = apply_filters( 'pp_glossary_excluded_tags', $excluded_tags );
-
-		// Build the pattern for excluded tags only.
-		$excluded_pattern = '';
-		foreach ( $excluded_tags as $tag ) {
-			$excluded_pattern .= '<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>|';
-		}
-		$excluded_pattern = rtrim( $excluded_pattern, '|' );
-
-		// Split content ONCE by excluded tags.
-		$parts = preg_split( '/(' . $excluded_pattern . ')/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
-
-		// If preg_split fails, return content unchanged.
 		if ( false === $parts ) {
 			return $content;
 		}
@@ -323,7 +236,12 @@ class Content_Filter {
 		$popover_html .= sprintf( '<strong class="glossary-title" aria-hidden="true">%s</strong>', $title );
 
 		if ( ! empty( $entry['short_description'] ) ) {
-			$popover_html .= sprintf( '<p>%s</p>', esc_html( $entry['short_description'] ) );
+			// Link glossary terms within the short description, excluding self.
+			$short_desc    = Term_Linker::link_terms_in_text(
+				$entry['short_description'],
+				$entry['id']
+			);
+			$popover_html .= sprintf( '<p>%s</p>', wp_kses_post( $short_desc ) );
 		}
 
 		if ( $has_read_more ) {
