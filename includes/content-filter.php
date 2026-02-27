@@ -30,13 +30,6 @@ class PP_Glossary_Content_Filter {
 	private static $popovers = array();
 
 	/**
-	 * Flag to track if helper text has been added
-	 *
-	 * @var bool
-	 */
-	private static $helper_added = false;
-
-	/**
 	 * Initialize the content filter
 	 */
 	public static function init() {
@@ -52,8 +45,7 @@ class PP_Glossary_Content_Filter {
 	public static function filter_content( $content ) {
 		// Reset counters and storage for each content piece
 		self::$popover_counter = 0;
-		self::$popovers        = array();
-		self::$helper_added    = false;
+		self::$popovers = array();
 
 		// Don't process on glossary entries themselves
 		if ( is_singular( 'pp_glossary' ) ) {
@@ -81,11 +73,7 @@ class PP_Glossary_Content_Filter {
 		// Append all popovers at the end
 		if ( ! empty( self::$popovers ) ) {
 			$content .= "\n" . implode( "\n", self::$popovers );
-
-			// Add helper text once if we have any popovers
-			if ( self::$helper_added ) {
-				$content .= self::get_helper_text();
-			}
+			$content .= self::get_helper_text();
 		}
 
 		return $content;
@@ -121,12 +109,8 @@ class PP_Glossary_Content_Filter {
 				// Build array of terms (title + synonyms)
 				$terms = array( get_the_title() );
 
-				if ( $synonyms && is_array( $synonyms ) ) {
-					foreach ( $synonyms as $synonym ) {
-						if ( ! empty( $synonym ) ) {
-							$terms[] = $synonym;
-						}
-					}
+				if ( is_array( $synonyms ) ) {
+					$terms = array_merge( $terms, array_filter( $synonyms ) );
 				}
 
 				$entries[] = array(
@@ -185,9 +169,6 @@ class PP_Glossary_Content_Filter {
 
 				// Store the popover for later
 				self::$popovers[] = self::create_popover( $entry, $unique_id, $popover_id );
-
-				// Mark that we need helper text
-				self::$helper_added = true;
 
 				// Break after first replacement for this entry
 				break;
