@@ -37,6 +37,13 @@ class PP_Glossary_Content_Filter {
 	private static $helper_added = false;
 
 	/**
+	 * Flag to track if glossary terms were found on the current page
+	 *
+	 * @var bool
+	 */
+	public static $terms_found_on_page = false;
+
+	/**
 	 * Initialize the content filter
 	 */
 	public static function init() {
@@ -188,6 +195,9 @@ class PP_Glossary_Content_Filter {
 
 				// Mark that we need helper text
 				self::$helper_added = true;
+
+				// Mark that terms were found on this page
+				self::$terms_found_on_page = true;
 
 				// Break after first replacement for this entry
 				break;

@@ -54,6 +54,10 @@ class PP_Glossary_Blocks {
 	public static function render_glossary_list_block( $attributes ) {
 		$grouped_entries = self::get_grouped_entries();
 
+		if ( ! empty( $grouped_entries ) ) {
+			PP_Glossary_Content_Filter::$terms_found_on_page = true;
+		}
+
 		ob_start();
 		?>
 		<div class="pp-glossary-block">
