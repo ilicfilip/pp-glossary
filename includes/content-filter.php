@@ -121,12 +121,8 @@ class PP_Glossary_Content_Filter {
 				// Build array of terms (title + synonyms)
 				$terms = array( get_the_title() );
 
-				if ( $synonyms && is_array( $synonyms ) ) {
-					foreach ( $synonyms as $synonym ) {
-						if ( ! empty( $synonym ) ) {
-							$terms[] = $synonym;
-						}
-					}
+				if ( ! empty( $synonyms ) && is_array( $synonyms ) ) {
+					$terms = array_merge( $terms, array_filter( $synonyms ) );
 				}
 
 				$entries[] = array(

@@ -145,8 +145,6 @@
 		const popoverRect = popover.getBoundingClientRect();
 		const viewportWidth = window.innerWidth;
 		const viewportHeight = window.innerHeight;
-		const scrollY = window.scrollY || window.pageYOffset;
-		const scrollX = window.scrollX || window.pageXOffset;
 
 		// Small offset from trigger (reduced from 8px to 4px)
 		const offset = 4;
