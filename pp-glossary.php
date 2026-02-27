@@ -61,7 +61,7 @@ function pp_glossary_enqueue_assets() {
 		true
 	);
 }
-add_action( 'wp_enqueue_scripts', 'pp_glossary_enqueue_assets' );
+add_action( 'wp_footer', 'pp_glossary_enqueue_assets', 1 );
 
 /**
  * Activation hook
