@@ -52,6 +52,9 @@ class PP_Glossary_Blocks {
 	 * @return string Block HTML.
 	 */
 	public static function render_glossary_list_block( $attributes ) {
+		// Mark that glossary assets are needed on this page.
+		PP_Glossary_Content_Filter::$terms_found_on_page = true;
+
 		$grouped_entries = self::get_grouped_entries();
 
 		ob_start();
