@@ -185,12 +185,7 @@ class PP_Glossary_Meta_Boxes {
 		// Save synonyms
 		$synonyms = array();
 		if ( isset( $_POST['pp_glossary_synonyms'] ) && is_array( $_POST['pp_glossary_synonyms'] ) ) {
-			foreach ( $_POST['pp_glossary_synonyms'] as $synonym ) {
-				$synonym = sanitize_text_field( $synonym );
-				if ( ! empty( $synonym ) ) {
-					$synonyms[] = $synonym;
-				}
-			}
+			$synonyms = array_values( array_filter( array_map( 'sanitize_text_field', $_POST['pp_glossary_synonyms'] ) ) );
 		}
 		update_post_meta( $post_id, '_pp_glossary_synonyms', $synonyms );
 	}

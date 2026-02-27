@@ -84,15 +84,7 @@ class PP_Glossary_Blocks {
 									<?php if ( ! empty( $entry['synonyms'] ) && is_array( $entry['synonyms'] ) ) : ?>
 										<div class="glossary-synonyms">
 											<span class="synonyms-label"><?php esc_html_e( 'Also known as:', 'pp-glossary' ); ?></span>
-											<?php
-											$synonym_terms = array();
-											foreach ( $entry['synonyms'] as $synonym ) {
-												if ( ! empty( $synonym ) ) {
-													$synonym_terms[] = esc_html( $synonym );
-												}
-											}
-											echo esc_html( implode( ', ', $synonym_terms ) );
-											?>
+											<?php echo esc_html( implode( ', ', array_filter( $entry['synonyms'] ) ) ); ?>
 										</div>
 									<?php endif; ?>
 
