@@ -43,17 +43,17 @@ function pp_glossary_init() {
 add_action( 'plugins_loaded', 'pp_glossary_init' );
 
 /**
- * Enqueue frontend assets
+ * Register frontend assets for later conditional enqueuing.
  */
-function pp_glossary_enqueue_assets() {
-	wp_enqueue_style(
+function pp_glossary_register_assets() {
+	wp_register_style(
 		'pp-glossary',
 		PP_GLOSSARY_PLUGIN_URL . 'assets/css/glossary.css',
 		array(),
 		PP_GLOSSARY_VERSION
 	);
 
-	wp_enqueue_script(
+	wp_register_script(
 		'pp-glossary',
 		PP_GLOSSARY_PLUGIN_URL . 'assets/js/glossary.js',
 		array(),
@@ -61,7 +61,20 @@ function pp_glossary_enqueue_assets() {
 		true
 	);
 }
-add_action( 'wp_enqueue_scripts', 'pp_glossary_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'pp_glossary_register_assets' );
+
+/**
+ * Enqueue frontend assets only when glossary terms were found on the page.
+ */
+function pp_glossary_enqueue_assets() {
+	if ( ! PP_Glossary_Content_Filter::$terms_found_on_page ) {
+		return;
+	}
+
+	wp_enqueue_style( 'pp-glossary' );
+	wp_enqueue_script( 'pp-glossary' );
+}
+add_action( 'wp_footer', 'pp_glossary_enqueue_assets' );
 
 /**
  * Activation hook

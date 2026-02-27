@@ -1,0 +1,7 @@
+.git
+.github
+.gitignore
+.distignore
+composer.json
+composer.lock
+CLAUDE.md

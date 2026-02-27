@@ -37,6 +37,13 @@ class PP_Glossary_Content_Filter {
 	private static $helper_added = false;
 
 	/**
+	 * Flag to track if glossary terms were found on the current page
+	 *
+	 * @var bool
+	 */
+	public static $terms_found_on_page = false;
+
+	/**
 	 * Initialize the content filter
 	 */
 	public static function init() {
@@ -80,6 +87,7 @@ class PP_Glossary_Content_Filter {
 
 		// Append all popovers at the end
 		if ( ! empty( self::$popovers ) ) {
+			self::$terms_found_on_page = true;
 			$content .= "\n" . implode( "\n", self::$popovers );
 
 			// Add helper text once if we have any popovers
