@@ -20,5 +20,11 @@
 	"scripts": {
 		"phpcs": "phpcs --standard=WordPress .",
 		"phpcbf": "phpcbf --standard=WordPress ."
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	}
 }
