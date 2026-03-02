@@ -1,0 +1,7 @@
+.github
+.gitignore
+.distignore
+composer.json
+composer.lock
+node_modules
+vendor

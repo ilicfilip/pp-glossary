@@ -52,6 +52,9 @@ class PP_Glossary_Blocks {
 	 * @return string Block HTML.
 	 */
 	public static function render_glossary_list_block( $attributes ) {
+		PP_Glossary_Content_Filter::$terms_found_on_page = true;
+		wp_enqueue_style( 'pp-glossary' );
+
 		$grouped_entries = self::get_grouped_entries();
 
 		ob_start();
