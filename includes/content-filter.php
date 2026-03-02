@@ -226,7 +226,7 @@ class PP_Glossary_Content_Filter {
 		$title = esc_html( $entry['title'] );
 
 		$popover_html = sprintf(
-			'<aside id="%s" popover="manual" role="tooltip" aria-labelledby="%s">',
+			'<aside id="%s" popover="auto" role="tooltip" aria-labelledby="%s">',
 			esc_attr( $popover_id ),
 			esc_attr( $unique_id )
 		);
